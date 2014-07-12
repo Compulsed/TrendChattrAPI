@@ -33,6 +33,50 @@ router.get('/', function(req, res) {
 	res.json({message: 'Wecome to the api!'});
 });
 
+// ---- /trends ----
+router.route('/trends')
+	.post(function(req, res) {
+		var trend = new Trend();
+		trend.name = req.body.name;
+
+		trend.save(function(err) {
+			if (err)
+				res.send(err);
+
+			res.json({ message: 'Trend Created' });
+		});
+	})
+
+	.get(function(req, res) {
+		Trend.find(function(err, trends) {
+			if (err)
+				res.send(err);
+
+			res.json(trends);
+		});
+	});
+
+// ---- /trends/:trend_id ----
+router.route('/trends/:trend_id')
+	.get(function(req, res) {
+		Trend.findById(req.params.trend_id, function(err, trend) {
+			if (err)
+				res.send(err);
+
+			res.send(trend);
+		});
+	})
+	.delete(function(req, res) {
+		Trend.remove({
+			_id: req.params.trend_id
+		}, function(err, trend) {
+			if(err)
+				res.send(err)
+
+			res.json({ message: "Successfully deleted"});
+		});
+	});
+
 //===================================
 //	END ROUTES
 //===================================
