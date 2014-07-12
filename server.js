@@ -30,7 +30,7 @@ router.use(function(req, res, next){
 
 // Simple API route and response function
 router.get('/', function(req, res) {
-	res.json({message: 'hooray! Wecome to the api!'});
+	res.json({message: 'Wecome to the api!'});
 });
 
 //===================================
@@ -38,7 +38,7 @@ router.get('/', function(req, res) {
 //===================================
 
 // All routes will be prefixed with '/api'
-app.use('/api', router);
+app.use('/api/dev', router);
 
 // Listen for requests
 app.listen(port);
