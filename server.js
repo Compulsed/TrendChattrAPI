@@ -52,7 +52,7 @@ router.route('/trends')
 	})
 
 	.get(function(req, res) {
-		Trend.find(function(err, trends) {
+		Trend.find({}, 'trend source',function(err, trends) {
 			if (err)
 				res.send(err);
 
