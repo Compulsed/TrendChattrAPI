@@ -1,6 +1,7 @@
 var https 		= require('https');
 var mongoose	= require('mongoose');
 var AuthToken 	= require('./models/auth_token');
+var Trend 		= require('./models/trend');
 
 //===================================
 //	Twitter Auth Credentials
@@ -32,7 +33,7 @@ function twitterAuthenticate(){
 		if (err) {
 			console.log(err);
 		} else {
-			if (!twitterAuthToken || twitterAuthToken === "" || twitterAuthToken === undefined){
+			if (!twitterAuthToken || twitterAuthToken === "" || twitterAuthToken === undefined){		
 				var options = {
 					host: 'api.twitter.com',
 					path: '/oauth2/token',
@@ -52,6 +53,7 @@ function twitterAuthenticate(){
 					});
 
 					res.on('end', function() {
+						AuthToken.remove({}, function(err){});
 						var body = JSON.parse(responseData);
 						twitterAuthToken = body.access_token;
 						var twitterAuth = new AuthToken;
@@ -82,7 +84,7 @@ function twitterTrends(lat, lon) {
 			if (twitterAuthToken === "" || !twitterAuthToken){
 				console.log("twitterAuthToken is empty");
 			} else {
-				var options = {
+				var closestOptions = {
 					host: 'api.twitter.com',
 					path: '/1.1/trends/closest.json?lat=' + lat + '&long=' + lon,
 					port: 443,
@@ -92,9 +94,7 @@ function twitterTrends(lat, lon) {
 					}
 				};
 
-				console.log(options);
-
-				var req = https.request(options, function(res) {
+				var req = https.request(closestOptions, function(res) {
 					var responseData = '';
 
 					res.on('data', function(chunk) {
@@ -102,15 +102,58 @@ function twitterTrends(lat, lon) {
 					});
 
 					res.on('end', function() {
-						console.log("got here");
-						console.log(responseData);
+						var body = JSON.parse(responseData);
+						var woeid = body[0].woeid;
+
+						console.log(woeid);
+
+						if (woeid && woeid !== "") {
+							var trendOptions = {
+								host: 'api.twitter.com',
+								path: '/1.1/trends/place.json?id=' + woeid,
+								port: 443,
+								method: 'GET',
+								headers: {
+									'Authorization': 'Bearer ' + twitterAuthToken
+								}
+							};
+							
+							console.log("updating twitter trends");
+							var trendReq = https.request(trendOptions, function(res) {
+								var trendResponseData = '';
+
+								res.on('data', function(chunk) {
+									trendResponseData += chunk;
+								});
+
+								res.on('end', function(){
+									var body = JSON.parse(trendResponseData);
+									var lastUpdated = body[0].as_of;
+									var trends = body[0].trends;
+
+									Trend.collection.remove({}, function(){});
+									trends.forEach(function(trendEntry) {
+										db_trend = new Trend();
+										db_trend.source = "twitter";
+										db_trend.trend = trendEntry.name;
+										db_trend.lastupdated = lastUpdated;
+										db_trend.save(function(err) {
+											if (err) {
+												console.log(err);
+											}
+										});
+									});
+								});
+							});
+
+							trendReq.end();
+						}
 					});
 				});
 				req.end();
 			}
 		}
 	});
-
 }
 
 module.exports.twitter = function (lat, lon){

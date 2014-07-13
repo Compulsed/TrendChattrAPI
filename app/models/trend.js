@@ -3,7 +3,9 @@ var Schema		= mongoose.Schema;
 
 // Specify the data in this model
 var TrendSchema = new Schema({
-	name: String
+	source: String,
+	trend: String,
+	lastupdated: String
 });
 
 // Export the model by name and schema
