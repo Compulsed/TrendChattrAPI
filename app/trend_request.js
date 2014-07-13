@@ -75,7 +75,7 @@ function twitterAuthenticate(){
 	
 }
 
-// Get the current trends from twitter
+// Get the current location trends from twitter 
 function twitterTrends(lat, lon) {
 	getToken("twitter", function(err, twitterAuthToken) {
 		if (err) {
@@ -147,7 +147,56 @@ function twitterTrends(lat, lon) {
 							});
 
 							trendReq.end();
+
 						}
+
+						console.log("updating global trends");
+						// Get global trends
+						var trendGlobalOptions = {
+							host: 'api.twitter.com',
+							path: '/1.1/trends/place.json?id=1',
+							port: 443,
+							method: 'GET',
+							headers: {
+								'Authorization': 'Bearer ' + twitterAuthToken
+							}
+						};
+
+						var trendReq = https.request(trendGlobalOptions, function(res) {
+							var trendResponseData = '';
+
+							res.on('data', function(chunk) {
+								trendResponseData += chunk;
+							});
+
+							res.on('end', function(){
+								var body = JSON.parse(trendResponseData);
+								var lastUpdated = body[0].as_of;
+								var trends = body[0].trends;
+
+								trends.forEach(function(trendEntry) {
+									Trend.find({ trend: trendEntry.name }, function(err, docs) {
+										if (err) {
+											console.log(err);
+										} else {
+											if (docs.length === 0) {
+												db_trend = new Trend();
+												db_trend.source = "twitter";
+												db_trend.trend = trendEntry.name;
+												db_trend.lastupdated = lastUpdated;
+												db_trend.save(function(err) {
+													if (err) {
+														console.log(err);
+													}
+												});
+											}
+										}
+									});
+								});
+							});
+						});
+
+						trendReq.end();
 					});
 				});
 				req.end();
