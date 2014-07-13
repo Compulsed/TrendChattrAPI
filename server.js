@@ -60,28 +60,6 @@ router.route('/trends')
 		});
 	});
 
-// // ---- /trends/:trend_id ----
-// router.route('/trends/:trend_id')
-// 	.get(function(req, res) {
-// 		Trend.findById(req.params.trend_id, function(err, trend) {
-// 			if (err)
-// 				res.send(err);
-
-// 			res.send(trend);
-// 		});
-// 	})
-
-// 	.delete(function(req, res) {
-// 		Trend.remove({
-// 			_id: req.params.trend_id
-// 		}, function(err, trend) {
-// 			if(err)
-// 				res.send(err)
-
-// 			res.json({ message: "Successfully deleted" });
-// 		});
-// 	});
-
 // ---- /trends/location ----
 router.route('/trends/location')
 	.get(function(req, res) {
