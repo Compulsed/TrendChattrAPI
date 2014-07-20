@@ -3,7 +3,7 @@ var Schema		= mongoose.Schema;
 
 // Specify the data in this model
 var UserSchema = new Schema({
-	name: String,
+	_id: String,
 	online: Boolean,
 	messages: [{type: Schema.Types.ObjectId, ref: 'Message'}]
 });

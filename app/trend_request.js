@@ -135,7 +135,7 @@ function twitterTrends(lat, lon) {
 									trends.forEach(function(trendEntry) {
 										db_trend = new Trend();
 										db_trend.source = "twitter";
-										db_trend.trend = trendEntry.name;
+										db_trend._id = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;
 										db_trend.save(function(err) {
 											if (err) {
@@ -182,7 +182,7 @@ function twitterTrends(lat, lon) {
 											if (docs.length === 0) {
 												db_trend = new Trend();
 												db_trend.source = "twitter";
-												db_trend.trend = trendEntry.name;
+												db_trend._id = trendEntry.name;
 												db_trend.lastupdated = lastUpdated;
 												db_trend.save(function(err) {
 													if (err) {

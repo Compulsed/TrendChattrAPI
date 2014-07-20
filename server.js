@@ -30,31 +30,19 @@ var router = express.Router();
 
 // Middleware for all requests
 router.use(function(req, res, next){
-	console.log("Something happened");
+	console.log("Got request");
 	next();
 });
 
 // Simple API route and response function
 router.get('/', function(req, res) {
-	res.json({message: 'Wecome to the api!'});
+	res.sendfile('apiref.html');
 });
 
 // ---- /trends ----
 router.route('/trends')
-	.post(function(req, res) {
-		var trend = new Trend();
-		trend.name = req.body.name;
-
-		trend.save(function(err) {
-			if (err)
-				res.send(err);
-
-			res.json({ message: 'Trend Created' });
-		});
-	})
-
 	.get(function(req, res) {
-		Trend.find({}, 'trend source',function(err, trends) {
+		Trend.find({}, '_id source',function(err, trends) {
 			if (err)
 				res.send(err);
 
@@ -73,17 +61,17 @@ router.route('/trends/location')
 	});
 
 // ---- /users ----
-router.route('/users')
+router.route('/users/:username')
 	.post(function(req, res) {
 		var user = new User();
-		user.name = req.query.username;
+		user._id = req.params.username;
 		user.online = true;
 
 		user.save(function(err){
 			if (err)
 				res.send(err);
 
-			res.ok();
+			res.send("User Created");
 		});
 	});
 
@@ -91,9 +79,35 @@ router.route('/users')
 router.route('/messages/:trend')
 	.post(function(req, res){
 		var message = new Message();
-		message.message = req.query.message;
+		message.message = req.body.message;
+		// Trend.findOne({_id: req.body.trend}, function(err, trend){
+		// 	if (err)
+		// 		res.send(err);
+
+		// 	message.trend = trend._id;
+		// });
 		message.trend = req.params.trend;
-		message.user = req.query.userid;
+
+		// User.findOne({_id: req.body.user}, function(err, user){
+		// 	if (err)
+		// 		res.send(err);
+
+		// 	message.user = user._id;
+		// });
+		message.user = req.body.user;
+		
+		message.save(function(err){
+			if (err)
+				res.send(err);
+
+			res.send("Message Stored");
+		});
+	})
+
+	.get(function(req, res){
+		Message.find({trend: req.params.trend},"user message sent", function(err, messages){
+			res.json(messages);
+		});
 	});
 
 //===================================

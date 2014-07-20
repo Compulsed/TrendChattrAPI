@@ -4,8 +4,9 @@ var Schema		= mongoose.Schema;
 // Specify the data in this model
 var MessageSchema = new Schema({
 	trend: {type: String, ref: 'Trend'},
-	user: {type: Schema.Types.ObjectId, ref: 'User'},
-	message: String
+	user: {type: String, ref: 'User'},
+	message: String,
+	sent: {type: Date, default: Date.now}
 });
 
 // Export the model by name and schema
