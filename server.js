@@ -42,6 +42,7 @@ router.get('/', function(req, res) {
 // ---- /trends ----
 router.route('/trends')
 	.get(function(req, res) {
+		TrendRequest.twitterGlobal();
 		Trend.find({}, '_id source',function(err, trends) {
 			if (err)
 				res.send(err);
@@ -56,7 +57,7 @@ router.route('/trends/location')
 		var lat = req.query.lat;
 		var lon = req.query.lon;
 
-		TrendRequest.twitter(lat, lon);
+		TrendRequest.twitterLocation(lat, lon);
 		res.json({ message: "Check the console" });
 	});
 

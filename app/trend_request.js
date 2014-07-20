@@ -1,5 +1,6 @@
 var https 		= require('https');
 var mongoose	= require('mongoose');
+var moment		= require('moment');
 var AuthToken 	= require('./models/auth_token');
 var Trend 		= require('./models/trend');
 
@@ -10,7 +11,9 @@ var twitterConsumerKey = encodeURIComponent("FkYMquZ0aRz2tiQgQ6RkwRta0");
 var twitterConsumerSecret = encodeURIComponent("K0SgrvidjSEHEdhr8KOJhFd2MPsh5bPMakLkJu9OErdOcfOhwr");
 
 var twitterBearerCredentials = twitterConsumerKey + ":" + twitterConsumerSecret;
-var twitterBase64Credentials = new Buffer(twitterBearerCredentials).toString('base64'); 
+var twitterBase64Credentials = new Buffer(twitterBearerCredentials).toString('base64');
+
+var lastGlobalUpdate = moment(0); // Initialise to epoch
 
 //===================================
 //	Auth Tokens
@@ -131,72 +134,21 @@ function twitterTrends(lat, lon) {
 									var lastUpdated = body[0].as_of;
 									var trends = body[0].trends;
 
-									Trend.collection.remove({}, function(){});
 									trends.forEach(function(trendEntry) {
 										db_trend = new Trend();
 										db_trend.source = "twitter";
 										db_trend._id = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;
-										db_trend.save(function(err) {
-											if (err) {
+										db_trend.save(function(err){
+											if (err)
 												console.log(err);
-											}
 										});
 									});
 								});
 							});
 
 							trendReq.end();
-
 						}
-
-						console.log("updating global trends");
-						// Get global trends
-						var trendGlobalOptions = {
-							host: 'api.twitter.com',
-							path: '/1.1/trends/place.json?id=1',
-							port: 443,
-							method: 'GET',
-							headers: {
-								'Authorization': 'Bearer ' + twitterAuthToken
-							}
-						};
-
-						var trendReq = https.request(trendGlobalOptions, function(res) {
-							var trendResponseData = '';
-
-							res.on('data', function(chunk) {
-								trendResponseData += chunk;
-							});
-
-							res.on('end', function(){
-								var body = JSON.parse(trendResponseData);
-								var lastUpdated = body[0].as_of;
-								var trends = body[0].trends;
-
-								trends.forEach(function(trendEntry) {
-									Trend.find({ trend: trendEntry.name }, function(err, docs) {
-										if (err) {
-											console.log(err);
-										} else {
-											if (docs.length === 0) {
-												db_trend = new Trend();
-												db_trend.source = "twitter";
-												db_trend._id = trendEntry.name;
-												db_trend.lastupdated = lastUpdated;
-												db_trend.save(function(err) {
-													if (err) {
-														console.log(err);
-													}
-												});
-											}
-										}
-									});
-								});
-							});
-						});
-
-						trendReq.end();
 					});
 				});
 				req.end();
@@ -205,7 +157,73 @@ function twitterTrends(lat, lon) {
 	});
 }
 
-module.exports.twitter = function (lat, lon){
-		twitterAuthenticate();
-		twitterTrends(lat, lon);
+function twitterTrendsGlobal() {
+	if (moment().diff(lastGlobalUpdate,'minutes') >= 5){
+		getToken("twitter", function(err, twitterAuthToken) {
+		if (err) {
+			console.log(err);
+		} else {
+			if (twitterAuthToken === "" || !twitterAuthToken){
+				console.log("twitterAuthToken is empty");
+			} else {
+				console.log("updating global trends");
+				// Get global trends
+				var trendGlobalOptions = {
+					host: 'api.twitter.com',
+					path: '/1.1/trends/place.json?id=1',
+					port: 443,
+					method: 'GET',
+					headers: {
+						'Authorization': 'Bearer ' + twitterAuthToken
+					}
+				};
+
+				var trendReq = https.request(trendGlobalOptions, function(res) {
+					var trendResponseData = '';
+
+					res.on('data', function(chunk) {
+						trendResponseData += chunk;
+					});
+
+					res.on('end', function(){
+						var body = JSON.parse(trendResponseData);
+						var lastUpdated = body[0].as_of;
+						var trends = body[0].trends;
+
+						trends.forEach(function(trendEntry) {
+							Trend.find({ trend: trendEntry.name }, function(err, docs) {
+								if (err) {
+									console.log(err);
+								} else {
+									if (docs.length === 0) {
+										db_trend = new Trend();
+										db_trend.source = "twitter";
+										db_trend._id = trendEntry.name;
+										db_trend.lastupdated = lastUpdated;
+										db_trend.save(function(err){
+											if (err)
+												console.log(err);
+										});
+									}
+								}
+							});
+						});
+					});
+				});
+
+				trendReq.end();
+				}
+			}
+		});
+	}
+}
+
+module.exports.twitterLocation = function (lat, lon){
+	twitterAuthenticate();
+	twitterTrends(lat, lon);
 };
+
+module.exports.twitterGlobal = function(){
+	twitterAuthenticate();
+	twitterTrendsGlobal();
+}
