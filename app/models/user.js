@@ -2,12 +2,11 @@ var mongoose 	= require('mongoose');
 var Schema		= mongoose.Schema;
 
 // Specify the data in this model
-var TrendSchema = new Schema({
-	source: String,
+var UserSchema = new Schema({
 	name: String,
-	lastupdated: String
+	online: Boolean,
 	messages: [{type: Schema.Types.ObjectId, ref: 'Message'}]
 });
 
 // Export the model by name and schema
-module.exports = mongoose.model('Trend', TrendSchema);
+module.exports = mongoose.model('User', UserSchema);
