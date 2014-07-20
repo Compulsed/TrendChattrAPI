@@ -11,6 +11,8 @@ mongoose.connect('mongodb://localhost:27017/api');
 
 // Required Models
 var Trend			= require('./app/models/trend');
+var User 			= require('./app/models/user');
+var Message 		= require('./app/models/message');
 
 // Import request functionality
 var TrendRequest 	= require('./app/trend_request');
@@ -68,6 +70,30 @@ router.route('/trends/location')
 
 		TrendRequest.twitter(lat, lon);
 		res.json({ message: "Check the console" });
+	});
+
+// ---- /users ----
+router.route('/users')
+	.post(function(req, res) {
+		var user = new User();
+		user.name = req.query.username;
+		user.online = true;
+
+		user.save(function(err){
+			if (err)
+				res.send(err);
+
+			res.ok();
+		});
+	});
+
+// ---- /messages/:trend ----
+router.route('/messages/:trend')
+	.post(function(req, res){
+		var message = new Message();
+		message.message = req.query.message;
+		message.trend = req.params.trend;
+		message.user = req.query.userid;
 	});
 
 //===================================
