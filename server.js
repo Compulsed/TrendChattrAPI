@@ -36,9 +36,13 @@ app.use(cors(corsOptions));
 //===================================
 //	SOCKET IO EVENT ROUTES
 //===================================
-var chat = io.of('/chat').on('send message', function(socket){
+var chat = io.of('/').on('connection', function(socket){
+	console.log("User Connected");
+	socket.on('message', function(msg){
 
+	});
 });
+
 //===================================
 //	ROUTES
 //===================================
