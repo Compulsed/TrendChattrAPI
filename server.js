@@ -5,6 +5,8 @@
 // Required Node modules
 var express 		= require('express');
 var app 			= express();
+var http			= require('http').Server(app);
+var io 				= require('socket.io')(http);
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
 mongoose.connect('mongodb://localhost:27017/api');
@@ -23,6 +25,12 @@ var port = process.env.PORT || 8080;
 // Body parser is used to process data from a POST request
 app.use(bodyParser());
 
+//===================================
+//	SOCKET IO EVENT ROUTES
+//===================================
+io.on('send message', function(socket){
+
+});
 //===================================
 //	ROUTES
 //===================================
@@ -81,20 +89,7 @@ router.route('/messages/:trend')
 	.post(function(req, res){
 		var message = new Message();
 		message.message = req.body.message;
-		// Trend.findOne({_id: req.body.trend}, function(err, trend){
-		// 	if (err)
-		// 		res.send(err);
-
-		// 	message.trend = trend._id;
-		// });
 		message.trend = req.params.trend;
-
-		// User.findOne({_id: req.body.user}, function(err, user){
-		// 	if (err)
-		// 		res.send(err);
-
-		// 	message.user = user._id;
-		// });
 		message.user = req.body.user;
 		
 		message.save(function(err){
