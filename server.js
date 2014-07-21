@@ -2,11 +2,16 @@
  *	API route specifications and handler functions
  */
 
+// Define API listening port
+var port = process.env.PORT || 8080;
+
 // Required Node modules
 var express 		= require('express');
 var app 			= express();
 var http			= require('http').Server(app);
-var io 				= require('socket.io')(http);
+var server 			= app.listen(port);
+var io 				= require('socket.io').listen(server);
+var cors			= require('cors');
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
 mongoose.connect('mongodb://localhost:27017/api');
@@ -19,16 +24,19 @@ var Message 		= require('./app/models/message');
 // Import request functionality
 var TrendRequest 	= require('./app/trend_request');
 
-// Define API listening port
-var port = process.env.PORT || 8080;
-
 // Body parser is used to process data from a POST request
 app.use(bodyParser());
 
+var corsOptions = {
+	origin: true,
+	credentials: true
+}
+
+app.use(cors(corsOptions));
 //===================================
 //	SOCKET IO EVENT ROUTES
 //===================================
-io.on('send message', function(socket){
+var chat = io.of('/chat').on('send message', function(socket){
 
 });
 //===================================
@@ -38,6 +46,7 @@ var router = express.Router();
 
 // Middleware for all requests
 router.use(function(req, res, next){
+	res.setHeader("Access-Control-Allow-Credentials", "true");
 	console.log("Got request");
 	next();
 });
@@ -113,7 +122,7 @@ router.route('/messages/:trend')
 // All routes will be prefixed with '/api'
 app.use('/api/dev', router);
 
-// Listen for requests
-app.listen(port);
+// // Listen for requests
+// app.listen(port);
 
 console.log("API now listening on port: " + port);
