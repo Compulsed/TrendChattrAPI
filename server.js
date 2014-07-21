@@ -27,6 +27,7 @@ var TrendRequest 	= require('./app/trend_request');
 // Body parser is used to process data from a POST request
 app.use(bodyParser());
 
+// Set CORS Headers (changing this will break socket.io functionality)
 var corsOptions = {
 	origin: true,
 	credentials: true
@@ -38,8 +39,10 @@ app.use(cors(corsOptions));
 //===================================
 var chat = io.of('/').on('connection', function(socket){
 	console.log("User Connected");
+	socket.join('All');
 	socket.on('message', function(msg){
-
+		// Send to all but self
+		socket.broadcast.to('All').emit('message', msg);
 	});
 });
 
