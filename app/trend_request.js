@@ -159,6 +159,7 @@ function twitterTrends(lat, lon) {
 
 function twitterTrendsGlobal() {
 	if (moment().diff(lastGlobalUpdate,'minutes') >= 5){
+		lastGlobalUpdate = moment();
 		getToken("twitter", function(err, twitterAuthToken) {
 		if (err) {
 			console.log(err);
