@@ -17,7 +17,7 @@ var mongoose 		= require('mongoose');
 mongoose.connect('mongodb://localhost:27017/api');
 
 // Required Models
-var Trend			= require('./app/models/trend');
+var Chatroom			= require('./app/models/chatroom');
 var User 			= require('./app/models/user');
 var Message 		= require('./app/models/message');
 
@@ -42,6 +42,7 @@ var chat = io.of('/').on('connection', function(socket){
 	socket.join('All');
 	socket.on('message', function(msg){
 		// Send to all but self
+		console.log(msg);
 		socket.broadcast.to('All').emit('message', msg);
 	});
 });
@@ -63,11 +64,11 @@ router.get('/', function(req, res) {
 	res.sendfile('apiref.html');
 });
 
-// ---- /trends ----
-router.route('/trends')
+// ---- /chatrooms ----
+router.route('/chatrooms')
 	.get(function(req, res) {
 		TrendRequest.twitterGlobal();
-		Trend.find({}, '_id source',function(err, trends) {
+		Chatroom.find({}, '_id source',function(err, trends) {
 			if (err)
 				res.send(err);
 
@@ -76,7 +77,7 @@ router.route('/trends')
 	});
 
 // ---- /trends/location ----
-router.route('/trends/location')
+router.route('/chatrooms/location')
 	.get(function(req, res) {
 		var lat = req.query.lat;
 		var lon = req.query.lon;
@@ -101,12 +102,12 @@ router.route('/users/:username')
 	});
 
 // ---- /messages/:trend ----
-router.route('/messages/:trend')
+router.route('/messages/:chatroom')
 	.post(function(req, res){
 		var message = new Message();
 		message.message = req.body.message;
-		message.trend = req.params.trend;
-		message.user = req.body.user;
+		message.chatroom = req.params.chatroom;
+		message.username = req.body.username;
 		
 		message.save(function(err){
 			if (err)
@@ -117,7 +118,7 @@ router.route('/messages/:trend')
 	})
 
 	.get(function(req, res){
-		Message.find({trend: req.params.trend},"user message sent", function(err, messages){
+		Message.find({chatroom: req.params.chatroom},"user message sent", function(err, messages){
 			res.json(messages);
 		});
 	});

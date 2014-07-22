@@ -2,7 +2,7 @@ var https 		= require('https');
 var mongoose	= require('mongoose');
 var moment		= require('moment');
 var AuthToken 	= require('./models/auth_token');
-var Trend 		= require('./models/trend');
+var Chatroom 		= require('./models/chatroom');
 
 //===================================
 //	Twitter Auth Credentials
@@ -135,7 +135,7 @@ function twitterTrends(lat, lon) {
 									var trends = body[0].trends;
 
 									trends.forEach(function(trendEntry) {
-										db_trend = new Trend();
+										db_trend = new Chatroom();
 										db_trend.source = "twitter";
 										db_trend._id = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;
@@ -197,7 +197,7 @@ function twitterTrendsGlobal() {
 									console.log(err);
 								} else {
 									if (docs.length === 0) {
-										db_trend = new Trend();
+										db_trend = new Chatroom();
 										db_trend.source = "twitter";
 										db_trend._id = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;

@@ -3,8 +3,8 @@ var Schema		= mongoose.Schema;
 
 // Specify the data in this model
 var MessageSchema = new Schema({
-	trend: {type: String, ref: 'Trend'},
-	user: {type: String, ref: 'User'},
+	chatroom: {type: String, ref: 'Chatroom'},
+	username: {type: String, ref: 'User'},
 	message: String,
 	sent: {type: Date, default: Date.now}
 });
