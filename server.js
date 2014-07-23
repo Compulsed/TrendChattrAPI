@@ -39,11 +39,12 @@ app.use(cors(corsOptions));
 //===================================
 var chat = io.of('/').on('connection', function(socket){
 	console.log("User Connected");
-	socket.join('All');
+
 	socket.on('message', function(msg){
 		// Send to all but self
+		socket.join(msg.chatroom);
 		console.log(msg);
-		socket.broadcast.to('All').emit('message', msg);
+		socket.broadcast.to(msg.chatroom).emit('message', msg);
 	});
 });
 
