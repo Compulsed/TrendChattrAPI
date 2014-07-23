@@ -42,9 +42,13 @@ var chat = io.of('/').on('connection', function(socket){
 
 	socket.on('message', function(msg){
 		// Send to all but self
-		socket.join(msg.chatroom);
+		socket.join(msg.chatroom.chatroom);
 		console.log(msg);
-		socket.broadcast.to(msg.chatroom).emit('message', msg);
+		socket.broadcast.to(msg.chatroom.chatroom).emit('message', msg);
+	});
+
+	socket.on('error', function(error){
+		console.log(error);
 	});
 });
 
