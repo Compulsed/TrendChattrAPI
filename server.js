@@ -47,6 +47,10 @@ var chat = io.of('/').on('connection', function(socket){
 		socket.broadcast.to(msg.chatroom.chatroom).emit('message', msg);
 	});
 
+	socket.on('join', function(chatroom){
+		socket.join(chatroom);
+	});
+
 	socket.on('error', function(error){
 		console.log(error);
 	});
