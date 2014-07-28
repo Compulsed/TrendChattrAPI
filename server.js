@@ -14,7 +14,7 @@ var io 				= require('socket.io').listen(server);
 var cors			= require('cors');
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
-mongoose.connect('mongodb://localhost:27017/api');
+mongoose.connect('mongodb://localhost/api');
 
 // Required Models
 var Chatroom		= require('./app/models/chatroom');
