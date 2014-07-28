@@ -77,11 +77,12 @@ router.get('/', function(req, res) {
 router.route('/chatrooms')
 	.get(function(req, res) {
 		TrendRequest.twitterGlobal();
-		Chatroom.find({}, '_id source',function(err, trends) {
+		Chatroom.find({}, 'id chatroom source',function(err, trends) {
+			restRes = {'chatrooms': trends}
 			if (err)
 				res.send(err);
 
-			res.json(trends);
+			res.json(restRes);
 		});
 	});
 

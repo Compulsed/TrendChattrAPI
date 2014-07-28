@@ -137,7 +137,7 @@ function twitterTrends(lat, lon) {
 									trends.forEach(function(trendEntry) {
 										db_trend = new Chatroom();
 										db_trend.source = "twitter";
-										db_trend._id = trendEntry.name;
+										db_trend.chatroom = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;
 										db_trend.save(function(err){
 											if (err)
@@ -192,14 +192,14 @@ function twitterTrendsGlobal() {
 						var trends = body[0].trends;
 
 						trends.forEach(function(trendEntry) {
-							Trend.find({ trend: trendEntry.name }, function(err, docs) {
+							Chatroom.find({ chatroom: trendEntry.name }, function(err, docs) {
 								if (err) {
 									console.log(err);
 								} else {
 									if (docs.length === 0) {
 										db_trend = new Chatroom();
 										db_trend.source = "twitter";
-										db_trend._id = trendEntry.name;
+										db_trend.chatroom = trendEntry.name;
 										db_trend.lastupdated = lastUpdated;
 										db_trend.save(function(err){
 											if (err)

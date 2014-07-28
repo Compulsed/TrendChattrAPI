@@ -3,11 +3,14 @@ var Schema		= mongoose.Schema;
 
 // Specify the data in this model
 var ChatroomSchema = new Schema({
-	_id: String,
-	id: Number,
-	joined: {type: Number, default: 0},
 	source: String,
+	chatroom: String,
+	joined: {type: Number, default: 0},
 	lastupdated: String
+});
+
+ChatroomSchema.virtual('id').get(function(){
+	return this._id.toHexString();
 });
 
 // Export the model by name and schema
