@@ -191,6 +191,11 @@ function twitterTrendsGlobal() {
 						var lastUpdated = body[0].as_of;
 						var trends = body[0].trends;
 
+						Chatroom.remove({}, function(err){
+							if (err) {
+								console.log(err);
+							}
+						});
 						trends.forEach(function(trendEntry) {
 							Chatroom.find({ chatroom: trendEntry.name }, function(err, docs) {
 								if (err) {
