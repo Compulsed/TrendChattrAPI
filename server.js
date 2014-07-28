@@ -15,7 +15,7 @@ var cors			= require('cors');
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
 
-var mongourl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/api';
+var mongourl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/api';
 mongoose.connect(mongourl);
 
 // Required Models
@@ -140,7 +140,7 @@ router.route('/messages/:chatroom')
 //	END ROUTES
 //===================================
 // All routes will be prefixed with '/api'
-// app.use('/api/dev', router);
+app.use('/', router);
 
 // // Listen for requests
 // app.listen(port);
