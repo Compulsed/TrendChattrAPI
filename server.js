@@ -138,7 +138,7 @@ router.route('/messages/:chatroom')
 //	END ROUTES
 //===================================
 // All routes will be prefixed with '/api'
-app.use('/api/dev', router);
+// app.use('/api/dev', router);
 
 // // Listen for requests
 // app.listen(port);
