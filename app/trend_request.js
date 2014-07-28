@@ -2,7 +2,7 @@ var https 		= require('https');
 var mongoose	= require('mongoose');
 var moment		= require('moment');
 var AuthToken 	= require('./models/auth_token');
-var Chatroom 		= require('./models/chatroom');
+var Chatroom 	= require('./models/chatroom');
 
 //===================================
 //	Twitter Auth Credentials

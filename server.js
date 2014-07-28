@@ -17,7 +17,7 @@ var mongoose 		= require('mongoose');
 mongoose.connect('mongodb://localhost:27017/api');
 
 // Required Models
-var Chatroom			= require('./app/models/chatroom');
+var Chatroom		= require('./app/models/chatroom');
 var User 			= require('./app/models/user');
 var Message 		= require('./app/models/message');
 
@@ -34,24 +34,25 @@ var corsOptions = {
 }
 
 app.use(cors(corsOptions));
+
 //===================================
 //	SOCKET IO EVENT ROUTES
 //===================================
 var chat = io.of('/').on('connection', function(socket){
 	console.log("User Connected");
 
-	socket.on('message', function(msg){
+	socket.on('message', function(msg) {
 		// Send to all but self
 		socket.join(msg.chatroom.chatroom);
 		console.log(msg);
 		socket.broadcast.to(msg.chatroom.chatroom).emit('message', msg);
 	});
 
-	socket.on('join', function(chatroom){
+	socket.on('join', function(chatroom) {
 		socket.join(chatroom);
 	});
 
-	socket.on('error', function(error){
+	socket.on('error', function(error) {
 		console.log(error);
 	});
 });
@@ -136,7 +137,6 @@ router.route('/messages/:chatroom')
 //===================================
 //	END ROUTES
 //===================================
-
 // All routes will be prefixed with '/api'
 app.use('/api/dev', router);
 
