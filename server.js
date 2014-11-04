@@ -1,4 +1,4 @@
-/*	
+/*
  *	API route specifications and handler functions
  */
 
@@ -81,7 +81,7 @@ router.route('/chatrooms')
 	.get(function(req, res) {
 		TrendRequest.twitterGlobal();
 		Chatroom.find({}, 'id chatroom source',function(err, trends) {
-			restRes = {'chatrooms': trends}
+			restRes = {trends}
 			if (err)
 				res.send(err);
 
@@ -121,7 +121,7 @@ router.route('/messages/:chatroom')
 		message.message = req.body.message;
 		message.chatroom = req.params.chatroom;
 		message.username = req.body.username;
-		
+
 		message.save(function(err){
 			if (err)
 				res.send(err);
