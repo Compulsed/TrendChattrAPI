@@ -28,6 +28,7 @@
     "moment": "^2.7.0",
     "mongoose": "3.8.x",
     "passport": "^0.2.1",
+    "rand-token": "^0.2.1",
     "socket.io": "^1.0.6"
   }
 }

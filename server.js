@@ -15,6 +15,7 @@ var cors			= require('cors');
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
 var bcrypt		= require('bcrypt');
+var randtoken = require('rand-token').uid;
 
 var mongourl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/api';
 mongoose.connect(mongourl);
@@ -190,6 +191,33 @@ router.route('/register')
 				});
 			}
 		});
+	});
+
+router.route('/login')
+	.post(function(req,res){
+		if (req.body.username && req.body.password) {
+			User.findOne({username: req.body.username}, function(err, doc) {
+				if (err)
+					res.status(500).send(err);
+				else if (!doc) {
+					res.status(404).send("Username or password incorrect");
+				} else {
+					bcrypt.compare(req.body.password, doc.passwordhash, function(err, auth){
+						if (auth) {
+							// Generate a UID token
+							var token = randtoken(16);
+							res.send(token);
+							doc.token = token;
+							doc.save();
+						} else {
+							res.status(404).send("Username or password incorrect");
+						}
+					});
+				}
+			});
+		} else {
+			res.status(400).send("Must supply username and password");
+		}
 	});
 
 //===================================
