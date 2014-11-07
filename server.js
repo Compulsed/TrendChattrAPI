@@ -156,39 +156,38 @@ router.route('/register')
 						res.status(409).send("Email already taken");
 					} else if (err) {
 						res.status(500).send(err);
+					} else {
+						// User doesn't exist and email isn't used
+						var NewUser = new User(); // Create a new User model instance
+
+						NewUser.fullname = req.body.fullname;
+
+						// Was a password provided?
+						if (!req.body.password){
+							res.status(400).send("No password supplied");
+						} else {
+							NewUser.username = req.body.username;
+							NewUser.email = req.body.email;
+
+							bcrypt.genSalt(10, function(err, salt){
+								bcrypt.hash(req.body.password, salt, function(err, hash){
+									if (err) {
+										res.status(500).send(err);
+									} else {
+										NewUser.passwordhash = hash;
+										NewUser.token = null;
+										NewUser.save(function(err){
+											if (err)
+												res.send(err);
+											else
+												res.send("User Created");
+										});
+									}
+								});
+							});
+						}
 					}
 				});
-				// User doesn't exist and email isn't used
-				var NewUser = new User(); // Create a new User model instance
-
-				NewUser.fullname = req.body.fullname;
-
-				// Perform some basic validation
-				if (!req.body.username) {
-					res.status(400).send("No username");
-				} else if (!req.body.email) {
-					res.status(400).send("No email");
-				} else {
-					NewUser.username = req.body.username;
-					NewUser.email = req.body.email;
-
-					bcrypt.genSalt(10, function(err, salt){
-						bcrypt.hash(req.body.password, salt, function(err, hash){
-							if (err) {
-								res.status(500).send(err);
-							} else {
-								NewUser.passwordhash = hash;
-								NewUser.token = null;
-								NewUser.save(function(err){
-									if (err)
-										res.send(err);
-									else
-										res.send("User Created");
-								});
-							}
-						});
-					});
-				}
 			}
 		});
 	});
