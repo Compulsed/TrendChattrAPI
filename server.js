@@ -14,9 +14,13 @@ var io 				= require('socket.io').listen(server);
 var cors			= require('cors');
 var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
+var bcrypt		= require('bcrypt');
 
 var mongourl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/api';
 mongoose.connect(mongourl);
+
+// Hash salt
+var salt = 'trendchattr-api';
 
 // Required Models
 var Chatroom		= require('./app/models/chatroom');
@@ -27,7 +31,7 @@ var Message 		= require('./app/models/message');
 var TrendRequest 	= require('./app/trend_request');
 
 // Body parser is used to process data from a POST request
-app.use(bodyParser());
+app.use(bodyParser.json());
 
 // Set CORS Headers (changing this will break socket.io functionality)
 var corsOptions = {
@@ -132,6 +136,60 @@ router.route('/messages/:chatroom')
 	.get(function(req, res){
 		Message.find({chatroom: req.params.chatroom},"user message sent", function(err, messages){
 			res.json(messages);
+		});
+	});
+
+
+// ---- /register ----
+router.route('/register')
+	.post(function(req, res){
+		// Check if username already exists
+		User.findOne({username: req.body.username}, function(err, doc){
+			if (doc) {
+				res.status(409).send("Username already exists");
+			} else if (err) {
+				res.status(500).send(err);
+			} else {
+				// Check to see if email is already registered
+				User.findOne({email: req.body.email}, function(err, doc){
+					if (doc) {
+						res.status(409).send("Email already taken");
+					} else if (err) {
+						res.status(500).send(err);
+					}
+				});
+				// User doesn't exist and email isn't used
+				var NewUser = new User(); // Create a new User model instance
+
+				NewUser.fullname = req.body.fullname;
+
+				// Perform some basic validation
+				if (!req.body.username) {
+					res.status(400).send("No username");
+				} else if (!req.body.email) {
+					res.status(400).send("No email");
+				} else {
+					NewUser.username = req.body.username;
+					NewUser.email = req.body.email;
+
+					bcrypt.genSalt(10, function(err, salt){
+						bcrypt.hash(req.body.password, salt, function(err, hash){
+							if (err) {
+								res.status(500).send(err);
+							} else {
+								NewUser.passwordhash = hash;
+								NewUser.token = null;
+								NewUser.save(function(err){
+									if (err)
+										res.send(err);
+									else
+										res.send("User Created");
+								});
+							}
+						});
+					});
+				}
+			}
 		});
 	});
 
