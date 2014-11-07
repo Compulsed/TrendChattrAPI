@@ -98,20 +98,20 @@ router.route('/chatrooms/location')
 		res.json({ message: "Check the console" });
 	});
 
-// ---- /users ----
-router.route('/users/:username')
-	.post(function(req, res) {
-		var user = new User();
-		user._id = req.params.username;
-		user.online = true;
-
-		user.save(function(err){
-			if (err)
-				res.send(err);
-
-			res.send("User Created");
-		});
-	});
+// ---- /users ---- (No Longer works)
+// router.route('/users/:username')
+// 	.post(function(req, res) {
+// 		var user = new User();
+// 		user._id = req.params.username;
+// 		user.online = true;
+//
+// 		user.save(function(err){
+// 			if (err)
+// 				res.send(err);
+//
+// 			res.send("User Created");
+// 		});
+// 	});
 
 // ---- /messages/:trend ----
 router.route('/messages/:chatroom')
@@ -138,10 +138,7 @@ router.route('/messages/:chatroom')
 //===================================
 //	END ROUTES
 //===================================
-// All routes will be prefixed with '/api'
+// All routes will be prefixed with '/'
 app.use('/', router);
-
-// // Listen for requests
-// app.listen(port);
 
 console.log("API now listening on port: " + port);
