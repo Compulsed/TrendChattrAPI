@@ -225,7 +225,11 @@ router.route('/login')
 						if (auth) {
 							// Generate a UID token
 							var token = randtoken(16);
-							res.send(token);
+							var response = {
+								"username": doc.username,
+								"token": token
+							}
+							res.send(response);
 							doc.token = token;
 							doc.save();
 						} else {
