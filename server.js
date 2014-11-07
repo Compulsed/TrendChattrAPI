@@ -43,6 +43,25 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 //===================================
+//	AUTHENTICATE USERS
+//===================================
+var requireApiToken = function(req,res,next) {
+	if (req.get('authorization')) {
+		User.findOne({token: req.get('authorization')}, function(err, doc){
+			if (err)
+				res.status(500).send(err);
+			else if (doc) {
+				next();
+			} else {
+				res.status(401).end();
+			}
+		});
+	} else {
+		res.status(401).send("Invalid Token")
+	}
+};
+
+//===================================
 //	SOCKET IO EVENT ROUTES
 //===================================
 var chat = io.of('/').on('connection', function(socket){
@@ -78,12 +97,12 @@ router.use(function(req, res, next){
 
 // Simple API route and response function
 router.get('/', function(req, res) {
-	res.sendfile('apiref.html');
+	res.sendFile(process.cwd() + '/apiref.html');
 });
 
 // ---- /chatrooms ----
 router.route('/chatrooms')
-	.get(function(req, res) {
+	.get(requireApiToken, function(req, res) {
 		TrendRequest.twitterGlobal();
 		Chatroom.find({}, 'id chatroom source',function(err, trends) {
 			if (err)
@@ -95,7 +114,7 @@ router.route('/chatrooms')
 
 // ---- /trends/location ----
 router.route('/chatrooms/location')
-	.get(function(req, res) {
+	.get(requireApiToken, function(req, res) {
 		var lat = req.query.lat;
 		var lon = req.query.lon;
 
@@ -120,7 +139,7 @@ router.route('/chatrooms/location')
 
 // ---- /messages/:trend ----
 router.route('/messages/:chatroom')
-	.post(function(req, res){
+	.post(requireApiToken, function(req, res){
 		var message = new Message();
 		message.message = req.body.message;
 		message.chatroom = req.params.chatroom;
@@ -134,7 +153,7 @@ router.route('/messages/:chatroom')
 		});
 	})
 
-	.get(function(req, res){
+	.get(requireApiToken, function(req, res){
 		Message.find({chatroom: req.params.chatroom},"user message sent", function(err, messages){
 			res.json(messages);
 		});
@@ -200,7 +219,7 @@ router.route('/login')
 				if (err)
 					res.status(500).send(err);
 				else if (!doc) {
-					res.status(404).send("Username or password incorrect");
+					res.status(401).send("Username or password incorrect");
 				} else {
 					bcrypt.compare(req.body.password, doc.passwordhash, function(err, auth){
 						if (auth) {
@@ -210,7 +229,7 @@ router.route('/login')
 							doc.token = token;
 							doc.save();
 						} else {
-							res.status(404).send("Username or password incorrect");
+							res.status(401).send("Username or password incorrect");
 						}
 					});
 				}
@@ -218,6 +237,21 @@ router.route('/login')
 		} else {
 			res.status(400).send("Must supply username and password");
 		}
+	});
+
+router.route('/logout')
+	.post(requireApiToken, function(req,res){
+		User.findOne({token: req.get('authorization')}, function(err, doc){
+			if (err)
+				res.status(500).send(err);
+			else if (doc) {
+				doc.token = null;
+				doc.save();
+				res.send("Successfully logged out");
+			} else {
+				res.send("Not logged in");
+			}
+		})
 	});
 
 //===================================
