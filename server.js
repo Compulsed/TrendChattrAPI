@@ -166,16 +166,16 @@ router.route('/register')
 		// Check if username already exists
 		User.findOne({username: req.body.username}, function(err, doc){
 			if (doc) {
-				res.status(409).send("Username already exists");
+				res.status(409).send({"error":"Username already exists"});
 			} else if (err) {
-				res.status(500).send(err);
+				res.status(500).send({"err": err});
 			} else {
 				// Check to see if email is already registered
 				User.findOne({email: req.body.email}, function(err, doc){
 					if (doc) {
-						res.status(409).send("Email already taken");
+						res.status(409).send({"error": "Email already taken"});
 					} else if (err) {
-						res.status(500).send(err);
+						res.status(500).send({"err": err});
 					} else {
 						// User doesn't exist and email isn't used
 						var NewUser = new User(); // Create a new User model instance
@@ -184,7 +184,7 @@ router.route('/register')
 
 						// Was a password provided?
 						if (!req.body.password){
-							res.status(400).send("No password supplied");
+							res.status(400).send({"error":"No password supplied"});
 						} else {
 							NewUser.username = req.body.username;
 							NewUser.email = req.body.email;
@@ -192,15 +192,15 @@ router.route('/register')
 							bcrypt.genSalt(10, function(err, salt){
 								bcrypt.hash(req.body.password, salt, function(err, hash){
 									if (err) {
-										res.status(500).send(err);
+										res.status(500).send({"error": err});
 									} else {
 										NewUser.passwordhash = hash;
 										NewUser.token = null;
 										NewUser.save(function(err){
 											if (err)
-												res.send(err);
+												res.send({"error": err});
 											else
-												res.send("User Created");
+												res.send({"message": "Registration Successful"});
 										});
 									}
 								});
