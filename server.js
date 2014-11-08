@@ -166,14 +166,14 @@ router.route('/register')
 		// Check if username already exists
 		User.findOne({username: req.body.username}, function(err, doc){
 			if (doc) {
-				res.status(409).send({"message":"Username already exists"});
+				res.status(401).send({"message":"Username already exists"});
 			} else if (err) {
 				res.status(500).send({"err": err});
 			} else {
 				// Check to see if email is already registered
 				User.findOne({email: req.body.email}, function(err, doc){
 					if (doc) {
-						res.status(409).send({"message": "Email already taken"});
+						res.status(401).send({"message": "Email already taken"});
 					} else if (err) {
 						res.status(500).send({"err": err});
 					} else {
@@ -184,7 +184,7 @@ router.route('/register')
 
 						// Was a password provided?
 						if (!req.body.password){
-							res.status(400).send({"message":"No password supplied"});
+							res.status(401).send({"message":"No password supplied"});
 						} else {
 							NewUser.username = req.body.username;
 							NewUser.email = req.body.email;
@@ -218,9 +218,9 @@ router.route('/login')
 		if (req.body.username && req.body.password) {
 			User.findOne({username: req.body.username}, function(err, doc) {
 				if (err)
-					res.status(500).send(err);
+					res.status(500).send({"error": err});
 				else if (!doc) {
-					res.status(401).send("Username or password incorrect");
+					res.status(401).send({"message": "Username or password incorrect"});
 				} else {
 					bcrypt.compare(req.body.password, doc.passwordhash, function(err, auth){
 						if (auth) {
@@ -234,13 +234,13 @@ router.route('/login')
 							doc.token = token;
 							doc.save();
 						} else {
-							res.status(401).send("Username or password incorrect");
+							res.status(401).send({"message": "Username or password incorrect"});
 						}
 					});
 				}
 			});
 		} else {
-			res.status(400).send("Must supply username and password");
+			res.status(401).send({"message": "Must supply username and password"});
 		}
 	});
 
