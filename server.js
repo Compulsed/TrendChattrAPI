@@ -251,9 +251,9 @@ router.route('/logout')
 			else if (doc) {
 				doc.token = null;
 				doc.save();
-				res.send("Successfully logged out");
+				res.send(true);
 			} else {
-				res.send("Not logged in");
+				res.send(false);
 			}
 		})
 	});
