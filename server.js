@@ -244,18 +244,22 @@ router.route('/login')
 	});
 
 router.route('/logout')
-	.post(requireApiToken, function(req,res){
-		User.findOne({token: req.get('authorization')}, function(err, doc){
-			if (err)
-				res.status(500).send(err);
-			else if (doc) {
-				doc.token = null;
-				doc.save();
-				res.send(true);
-			} else {
-				res.send(false);
-			}
-		})
+	.post(function(req,res){
+		if (req.get('authorization')){
+			User.findOne({token: req.get('authorization')}, function(err, doc){
+				if (err)
+					res.status(500).send(err);
+				else if (doc) {
+					doc.token = null;
+					doc.save();
+					res.send(true);
+				} else {
+					res.send(false);
+				}
+			});
+		} else {
+			res.send(true);
+		}
 	});
 
 //===================================
