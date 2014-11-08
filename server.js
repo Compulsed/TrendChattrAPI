@@ -200,7 +200,8 @@ router.route('/register')
 											if (err)
 												res.send({"error": err});
 											else
-												res.send({"message": "Registration Successful"});
+												res.send({"message": "Registration Successful",
+																	"status": true});
 										});
 									}
 								});
