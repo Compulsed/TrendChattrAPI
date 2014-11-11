@@ -31,6 +31,8 @@ var Message 		= require('./app/models/message');
 // Import request functionality
 var TrendRequest 	= require('./app/trend_request');
 
+var fatalError = "An error has occurred, please try again later";
+
 // Body parser is used to process data from a POST request
 app.use(bodyParser.json());
 
@@ -166,25 +168,36 @@ router.route('/register')
 		// Check if username already exists
 		User.findOne({username: req.body.username}, function(err, doc){
 			if (doc) {
-				res.status(401).send({"message":"Username already exists"});
+				res.status(401).send({"userMessage":"Username already exists",
+															"devMessage": "Username already exists"});
 			} else if (err) {
-				res.status(500).send({"err": err});
+				res.status(500).send({"userMessage": fatalError,
+															"devMessage": err});
 			} else {
 				// Check to see if email is already registered
 				User.findOne({email: req.body.email}, function(err, doc){
 					if (doc) {
-						res.status(401).send({"message": "Email already taken"});
+						res.status(401).send({"userMessage": "Email already taken",
+																	"devMessage": "Email already taken"});
 					} else if (err) {
-						res.status(500).send({"err": err});
+						res.status(500).send({"userMessage": fatalError,
+																	"devMessage": err});
 					} else {
 						// User doesn't exist and email isn't used
 						var NewUser = new User(); // Create a new User model instance
 
 						NewUser.fullname = req.body.fullname;
 
-						// Was a password provided?
-						if (!req.body.password){
-							res.status(401).send({"message":"No password supplied"});
+						// Were all the required fields supplied?
+						if(!req.body.username || req.body.username === ""){
+							res.status(401).send({"userMessage":"Username cannot be empty",
+																		"devMessage":"Username cannot be empty"});
+						}	else if (!req.body.email || req.body.email ===""){
+							res.status(401).send({"userMessage":"Email cannot be empty",
+																		"devMessage": "Email cannot be empty"});
+						} else if (!req.body.password || req.body.password ===""){
+							res.status(401).send({"userMessage":"Password cannot be empty",
+																		"devMessage":"Password cannot be empty"});
 						} else {
 							NewUser.username = req.body.username;
 							NewUser.email = req.body.email;
@@ -192,16 +205,18 @@ router.route('/register')
 							bcrypt.genSalt(10, function(err, salt){
 								bcrypt.hash(req.body.password, salt, function(err, hash){
 									if (err) {
-										res.status(500).send({"error": err});
+										res.status(500).send({"devMessage": err,
+																					"userMessage": fatalError});
 									} else {
 										NewUser.passwordhash = hash;
 										NewUser.token = null;
 										NewUser.save(function(err){
 											if (err)
-												res.send({"error": err});
+												res.send({"userMessage": fatalError,
+																	"devMessage": err});
 											else
-												res.send({"message": "Registration Successful",
-																	"status": true});
+												res.send({"userMessage": "Registration Successful",
+																	"devMessage": "Registration Successful"});
 										});
 									}
 								});
