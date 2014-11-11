@@ -233,9 +233,14 @@ router.route('/login')
 		if (req.body.username && req.body.password) {
 			User.findOne({username: req.body.username}, function(err, doc) {
 				if (err)
-					res.status(500).send({"error": err});
+					res.status(500).send({
+						"devMessage": err,
+						"userMessage": fatalError}
+						);
 				else if (!doc) {
-					res.status(401).send({"message": "Username or password incorrect"});
+					res.status(401).send({
+						"userMessage": "Username or password incorrect",
+						"devMessage": "Username or password incorrect"});
 				} else {
 					bcrypt.compare(req.body.password, doc.passwordhash, function(err, auth){
 						if (auth) {
@@ -249,13 +254,17 @@ router.route('/login')
 							doc.token = token;
 							doc.save();
 						} else {
-							res.status(401).send({"message": "Username or password incorrect"});
+							res.status(401).send({
+								"userMessage": "Username or password incorrect",
+								"devMessage": "Username or password incorrect"});
 						}
 					});
 				}
 			});
 		} else {
-			res.status(401).send({"message": "Must supply username and password"});
+			res.status(401).send({
+				"userMessage": "Must supply username and password",
+				"devMessage": "Must supply username and password"});
 		}
 	});
 
@@ -264,7 +273,7 @@ router.route('/logout')
 		if (req.get('authorization')){
 			User.findOne({token: req.get('authorization')}, function(err, doc){
 				if (err)
-					res.status(500).send(err);
+					res.status(500).send({"devMessage": err});
 				else if (doc) {
 					doc.token = null;
 					doc.save();
