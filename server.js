@@ -69,6 +69,8 @@ var requireApiToken = function(req,res,next) {
 var chat = io.of('/').on('connection', function(socket){
 	console.log("User Connected");
 
+	socket.emit('welcome',{ message: 'welcome'});
+
 	socket.on('message', function(msg) {
 		// Send to all but self
 		socket.join(msg.chatroom.chatroom);
