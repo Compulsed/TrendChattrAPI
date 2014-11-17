@@ -79,6 +79,7 @@ var chat = io.of('/').on('connection', function(socket){
 	});
 
 	socket.on('join', function(chatroom) {
+		console.log(chatroom);
 		socket.join(chatroom);
 	});
 
