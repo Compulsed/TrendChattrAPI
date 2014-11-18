@@ -171,7 +171,7 @@ function twitterTrendsGlobal() {
 				// Get global trends
 				var trendGlobalOptions = {
 					host: 'api.twitter.com',
-					path: '/1.1/trends/place.json?id=23424748',
+					path: '/1.1/trends/place.json?id=1103816',
 					port: 443,
 					method: 'GET',
 					headers: {
