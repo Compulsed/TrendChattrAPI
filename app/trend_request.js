@@ -36,7 +36,7 @@ function twitterAuthenticate(){
 		if (err) {
 			console.log(err);
 		} else {
-			if (!twitterAuthToken || twitterAuthToken === "" || twitterAuthToken === undefined){		
+			if (!twitterAuthToken || twitterAuthToken === "" || twitterAuthToken === undefined){
 				var options = {
 					host: 'api.twitter.com',
 					path: '/oauth2/token',
@@ -75,10 +75,10 @@ function twitterAuthenticate(){
 			}
 		}
 	});
-	
+
 }
 
-// Get the current location trends from twitter 
+// Get the current location trends from twitter
 function twitterTrends(lat, lon) {
 	getToken("twitter", function(err, twitterAuthToken) {
 		if (err) {
@@ -120,7 +120,7 @@ function twitterTrends(lat, lon) {
 									'Authorization': 'Bearer ' + twitterAuthToken
 								}
 							};
-							
+
 							console.log("updating twitter trends");
 							var trendReq = https.request(trendOptions, function(res) {
 								var trendResponseData = '';
@@ -171,7 +171,7 @@ function twitterTrendsGlobal() {
 				// Get global trends
 				var trendGlobalOptions = {
 					host: 'api.twitter.com',
-					path: '/1.1/trends/place.json?id=1',
+					path: '/1.1/trends/place.json?id=23424748',
 					port: 443,
 					method: 'GET',
 					headers: {
