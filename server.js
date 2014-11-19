@@ -251,6 +251,7 @@ router.route('/login')
 							var token = randtoken(16);
 							var response = {
 								"username": doc.username,
+								"email": doc.email,
 								"token": token
 							}
 							res.send(response);
