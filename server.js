@@ -16,12 +16,21 @@ var bodyParser 		= require('body-parser');
 var mongoose 		= require('mongoose');
 var bcrypt		= require('bcrypt');
 var randtoken = require('rand-token').uid;
+var nodemailer = require('nodemailer');
 
 var mongourl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/api';
 mongoose.connect(mongourl);
 
 // Hash salt
 var salt = 'trendchattr-api';
+
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'dparker.tech@gmail.com',
+        pass: 'h4xzmfym6'
+    }
+});
 
 // Required Models
 var Chatroom		= require('./app/models/chatroom');
@@ -289,6 +298,21 @@ router.route('/logout')
 		} else {
 			res.send(true);
 		}
+	});
+
+router.route('/feedback')
+	.post(function(req,res){
+		transporter.sendMail({
+      from: 'no-reply@trendchattr.com',
+      to: 'dparker.tech@gmail.com',
+      subject: 'trendchattr android: Feedback form submission',
+      text: 'The following message is feedback submitted by a user from the trendchattr Android app\n\n' +
+            'Version: ' + req.body.version + '\n' +
+						'Email: ' + req.body.email + '\n' +
+						'Message: ' + req.body.message
+  	});
+		res.send({"userMessage": "Email sent",
+							"devMessage": "Email sent"});
 	});
 
 //===================================
