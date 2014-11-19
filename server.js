@@ -302,6 +302,7 @@ router.route('/logout')
 
 router.route('/feedback')
 	.post(function(req,res){
+		console.log(req.body);
 		transporter.sendMail({
       from: 'no-reply@trendchattr.com',
       to: 'dparker.tech@gmail.com',
