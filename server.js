@@ -100,22 +100,22 @@ var chat = io.of('/').on('connection', function(socket){
 //===================================
 //	ROUTES
 //===================================
-var router = express.Router();
+var router1_0 = express.Router();
 
 // Middleware for all requests
-router.use(function(req, res, next){
+router1_0.use(function(req, res, next){
 	res.setHeader("Access-Control-Allow-Credentials", "true");
 	console.log("Got request");
 	next();
 });
 
 // Simple API route and response function
-router.get('/', function(req, res) {
+router1_0.get('/', function(req, res) {
 	res.sendFile(process.cwd() + '/apiref.html');
 });
 
 // ---- /chatrooms ----
-router.route('/chatrooms')
+router1_0.route('/chatrooms')
 	.get(requireApiToken, function(req, res) {
 		TrendRequest.twitterGlobal();
 		Chatroom.find({}, 'id chatroom source',function(err, trends) {
@@ -127,7 +127,7 @@ router.route('/chatrooms')
 	});
 
 // ---- /trends/location ----
-router.route('/chatrooms/location')
+router1_0.route('/chatrooms/location')
 	.get(requireApiToken, function(req, res) {
 		var lat = req.query.lat;
 		var lon = req.query.lon;
@@ -137,7 +137,7 @@ router.route('/chatrooms/location')
 	});
 
 // ---- /users ---- (No Longer works)
-// router.route('/users/:username')
+// router1_0.route('/users/:username')
 // 	.post(function(req, res) {
 // 		var user = new User();
 // 		user._id = req.params.username;
@@ -152,7 +152,7 @@ router.route('/chatrooms/location')
 // 	});
 
 // ---- /messages/:trend ----
-router.route('/messages/:chatroom')
+router1_0.route('/messages/:chatroom')
 	.post(requireApiToken, function(req, res){
 		var message = new Message();
 		message.message = req.body.message;
@@ -175,7 +175,7 @@ router.route('/messages/:chatroom')
 
 
 // ---- /register ----
-router.route('/register')
+router1_0.route('/register')
 	.post(function(req, res){
 		// Check if username already exists
 		User.findOne({username: req.body.username}, function(err, doc){
@@ -240,7 +240,7 @@ router.route('/register')
 		});
 	});
 
-router.route('/login')
+router1_0.route('/login')
 	.post(function(req,res){
 		if (req.body.username && req.body.password) {
 			User.findOne({username: req.body.username}, function(err, doc) {
@@ -281,7 +281,7 @@ router.route('/login')
 		}
 	});
 
-router.route('/logout')
+router1_0.route('/logout')
 	.post(function(req,res){
 		if (req.get('authorization')){
 			User.findOne({token: req.get('authorization')}, function(err, doc){
@@ -300,7 +300,7 @@ router.route('/logout')
 		}
 	});
 
-router.route('/feedback')
+router1_0.route('/feedback')
 	.post(function(req,res){
 		console.log(req.body);
 		transporter.sendMail({
@@ -319,7 +319,7 @@ router.route('/feedback')
 //===================================
 //	END ROUTES
 //===================================
-// All routes will be prefixed with '/'
-app.use('/', router);
+// All routes will be prefixed with '/1.0/'
+app.use('/1.0/', router1_0);
 
 console.log("API now listening on port: " + port);
