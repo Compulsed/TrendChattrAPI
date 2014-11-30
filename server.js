@@ -60,15 +60,18 @@ var requireApiToken = function(req,res,next) {
 	if (req.get('authorization')) {
 		User.findOne({token: req.get('authorization')}, function(err, doc){
 			if (err)
-				res.status(500).send(err);
+				res.status(500).send({"userMessage": fatalError,
+                              "devMessage": err});
 			else if (doc) {
 				next();
 			} else {
-				res.status(401).end();
+				res.status(401).end({"userMessage": "You are not logged in",
+                             "devMessage": "Authorization failed"});
 			}
 		});
 	} else {
-		res.status(401).send("Invalid Token")
+		res.status(401).send({"userMessage": "You are not logged in",
+                          "devMessage": "Authorization failed"})
 	}
 };
 
