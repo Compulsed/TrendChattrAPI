@@ -65,7 +65,7 @@ var requireApiToken = function(req,res,next) {
 			else if (doc) {
 				next();
 			} else {
-				res.status(401).send({"userMessage": "You are not logged in",
+				res.status(401).senkd({"userMessage": "You are not logged in",
                              "devMessage": "Authorization failed"});
 			}
 		});
@@ -85,6 +85,7 @@ var chat = io.of('/').on('connection', function(socket){
 
 	socket.on('message', function(msg) {
 		// Send to all but self
+    console.log(msg);
 		socket.join(msg.chatroom);
 		console.log(msg);
 		socket.broadcast.to(msg.chatroom).emit('message', msg);
