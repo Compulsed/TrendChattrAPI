@@ -65,7 +65,7 @@ var requireApiToken = function(req,res,next) {
 			else if (doc) {
 				next();
 			} else {
-				res.status(401).senkd({"userMessage": "You are not logged in",
+				res.status(401).send({"userMessage": "You are not logged in",
                              "devMessage": "Authorization failed"});
 			}
 		});
